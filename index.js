@@ -2,8 +2,6 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const compression = require('compression');
-const fs = require('fs');
-const path = require('path');
 
 app.use(compression({
     level: 5,
@@ -32,12 +30,13 @@ app.use(function (req, res, next) {
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Middleware to check if the IP is approved
-const checkApprovedIP = (req, res, next) => {
-    const approvedIPs = ['127.0.0.1', '178.128.62.38']; // Add approved IPs here
-    const userIP = req.ip;
+// List of licensed RDP IPs
+const licensedRDPIPs = ['178.128.62.38']; // Add licensed RDP IPs here
 
-    if (approvedIPs.includes(userIP)) {
+// Middleware to check if the RDP IP is licensed
+const checkLicensedRDPIP = (req, res, next) => {
+    const rdpIP = req.ip;
+    if (licensedRDPIPs.includes(rdpIP)) {
         next();
     } else {
         res.send('<html><body><h1>RDP KAMU BELUM DISETUJUI</h1></body></html>');
@@ -52,7 +51,7 @@ app.all('/player/register', function(req, res) {
     res.send("Coming soon...");
 });
 
-app.all('/player/login/dashboard', checkApprovedIP, function (req, res) {
+app.all('/player/login/dashboard', checkLicensedRDPIP, function (req, res) {
     const tData = {};
     try {
         const uData = JSON.stringify(req.body).split('"')[1].split('\\n'); 
@@ -69,7 +68,7 @@ app.all('/player/login/dashboard', checkApprovedIP, function (req, res) {
         console.log(`Warning: ${why}`); 
     }
 
-    res.render(path.join(__dirname, 'public/html/dashboard.ejs'), {data: tData});
+    res.render(__dirname + '/public/html/dashboard.ejs', {data: tData});
 });
 
 app.all('/player/growid/login/validate', (req, res) => {
@@ -91,7 +90,7 @@ app.all('/player/growid/checktoken', (req, res) => {
     try {
         const decoded = Buffer.from(refreshToken, 'base64').toString('utf-8');
         if (typeof decoded !== 'string' && !decoded.startsWith('growId=') && !decoded.includes('passwords=')) {
-            return res.render(path.join(__dirname, 'public/html/dashboard.ejs'));
+            return res.render(__dirname + '/public/html/dashboard.ejs');
         }
         res.json({
             status: 'success',
@@ -102,7 +101,7 @@ app.all('/player/growid/checktoken', (req, res) => {
         });
     } catch (error) {
         console.log("Redirecting to player login dashboard");
-        res.render(path.join(__dirname, 'public/html/dashboard.ejs'));
+        res.render(__dirname + '/public/html/dashboard.ejs');
     }
 });
 
