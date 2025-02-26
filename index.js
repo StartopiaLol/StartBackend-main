@@ -34,7 +34,7 @@ app.use(express.json());
 
 // Middleware to check if the IP is approved
 const checkApprovedIP = (req, res, next) => {
-    const approvedIPs = ['127.0.0.1']; // Add approved IPs here
+    const approvedIPs = ['127.0.0.1', '178.128.62.38']; // Add approved IPs here
     const userIP = req.ip;
 
     if (approvedIPs.includes(userIP)) {
