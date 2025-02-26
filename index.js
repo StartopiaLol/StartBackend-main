@@ -1,8 +1,9 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const rateLimiter = require('express-rate-limit');
 const compression = require('compression');
+const fs = require('fs');
+const path = require('path');
 
 app.use(compression({
     level: 5,
@@ -14,8 +15,10 @@ app.use(compression({
         return compression.filter(req, res);
     }
 }));
+
 app.set('view engine', 'ejs');
 app.set('trust proxy', 1);
+
 app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header(
@@ -25,24 +28,48 @@ app.use(function (req, res, next) {
     console.log(`[${new Date().toLocaleString()}] ${req.method} ${req.url} - ${res.statusCode}`);
     next();
 });
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
-//app.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 100, headers: true }));
+
+// Middleware to check if the IP is approved
+const checkApprovedIP = (req, res, next) => {
+    const approvedIPs = ['127.0.0.2']; // Add approved IPs here
+    const userIP = req.ip;
+
+    if (approvedIPs.includes(userIP)) {
+        next();
+    } else {
+        res.send('<html><body><h1>RDP KAMU BELUM DISETUJUI</h1></body></html>');
+    }
+};
+
 app.all('/favicon.ico', function(req, res) {
-    
+    res.sendStatus(204);
 });
+
 app.all('/player/register', function(req, res) {
     res.send("Coming soon...");
 });
-app.all('/player/login/dashboard', function (req, res) {
+
+app.all('/player/login/dashboard', checkApprovedIP, function (req, res) {
     const tData = {};
     try {
-        const uData = JSON.stringify(req.body).split('"')[1].split('\\n'); const uName = uData[0].split('|'); const uPass = uData[1].split('|');
-        for (let i = 0; i < uData.length - 1; i++) { const d = uData[i].split('|'); tData[d[0]] = d[1]; }
-        if (uName[1] && uPass[1]) { res.redirect('/player/growid/login/validate'); }
-    } catch (why) { console.log(`Warning: ${why}`); }
+        const uData = JSON.stringify(req.body).split('"')[1].split('\\n'); 
+        const uName = uData[0].split('|'); 
+        const uPass = uData[1].split('|');
+        for (let i = 0; i < uData.length - 1; i++) { 
+            const d = uData[i].split('|'); 
+            tData[d[0]] = d[1]; 
+        }
+        if (uName[1] && uPass[1]) { 
+            res.redirect('/player/growid/login/validate'); 
+        }
+    } catch (why) { 
+        console.log(`Warning: ${why}`); 
+    }
 
-    res.render(__dirname + '/public/html/dashboard.ejs', {data: tData});
+    res.render(path.join(__dirname, 'public/html/dashboard.ejs'), {data: tData});
 });
 
 app.all('/player/growid/login/validate', (req, res) => {
@@ -58,23 +85,27 @@ app.all('/player/growid/login/validate', (req, res) => {
         `{"status":"success","message":"Account Validated.","token":"${token}","url":"","accountType":"growtopia"}`,
     );
 });
+
 app.all('/player/growid/checktoken', (req, res) => {
     const { refreshToken } = req.body;
     try {
-    const decoded = Buffer.from(refreshToken, 'base64').toString('utf-8');
-    if (typeof decoded !== 'string' && !decoded.startsWith('growId=') && !decoded.includes('passwords=')) return res.render(__dirname + '/public/html/dashboard.ejs');
-    res.json({
-        status: 'success',
-        message: 'Account Validated.',
-        token: refreshToken,
-        url: '',
-        accountType: 'growtopia',
-    });
+        const decoded = Buffer.from(refreshToken, 'base64').toString('utf-8');
+        if (typeof decoded !== 'string' && !decoded.startsWith('growId=') && !decoded.includes('passwords=')) {
+            return res.render(path.join(__dirname, 'public/html/dashboard.ejs'));
+        }
+        res.json({
+            status: 'success',
+            message: 'Account Validated.',
+            token: refreshToken,
+            url: '',
+            accountType: 'growtopia',
+        });
     } catch (error) {
         console.log("Redirecting to player login dashboard");
-        res.render(__dirname + '/public/html/dashboard.ejs');
+        res.render(path.join(__dirname, 'public/html/dashboard.ejs'));
     }
 });
+
 app.get('/', function (req, res) {
    res.send('Hello Memek');
 });
