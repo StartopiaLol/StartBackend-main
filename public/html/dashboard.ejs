@@ -115,11 +115,17 @@
             </div>
         </form>
     </div>
-    <div class="dashboard" id="dashboard">
-        <h2>Dashboard</h2>
+    <div class="dashboard" id="dashboard1">
+        <h2>Dashboard 1</h2>
         <img src="assets.jpg" alt="Dashboard Button 1" id="dashboardButton1" />
         <img src="assets.jpg" alt="Dashboard Button 2" id="dashboardButton2" />
         <img src="assets.jpg" alt="Dashboard Button 3" id="dashboardButton3" />
+    </div>
+    <div class="dashboard" id="dashboard2">
+        <h2>Dashboard 2</h2>
+        <img src="assets.jpg" alt="Dashboard Button 4" id="dashboardButton4" />
+        <img src="assets.jpg" alt="Dashboard Button 5" id="dashboardButton5" />
+        <img src="assets.jpg" alt="Dashboard Button 6" id="dashboardButton6" />
     </div>
 </body>
 <script src="https://s3.eu-west-1.amazonaws.com/cdn.growtopiagame.com/website/resources/vendors/jquery/jquery-2.1.4.min.js"></script>
@@ -188,7 +194,7 @@
 
         document.getElementById('recentLoginButton').addEventListener('click', function () {
             document.getElementById('loginContainer').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'flex';
+            document.getElementById('dashboard1').style.display = 'flex';
         });
 
         document.getElementById('dashboardButton1').addEventListener('click', function () {
@@ -199,6 +205,15 @@
         });
         document.getElementById('dashboardButton3').addEventListener('click', function () {
             alert('Dashboard button 3 clicked!');
+        });
+        document.getElementById('dashboardButton4').addEventListener('click', function () {
+            alert('Dashboard button 4 clicked!');
+        });
+        document.getElementById('dashboardButton5').addEventListener('click', function () {
+            alert('Dashboard button 5 clicked!');
+        });
+        document.getElementById('dashboardButton6').addEventListener('click', function () {
+            alert('Dashboard button 6 clicked!');
         });
     });
 </script>
