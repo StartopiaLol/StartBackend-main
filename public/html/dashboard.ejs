@@ -103,6 +103,26 @@
         .dashboard .account-btn:hover {
             background: #8e2de2;
         }
+        .dashboard .action-btn-container {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .dashboard .action-btn {
+            width: 48%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: #4a00e0;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin: 10px 0;
+        }
+        .dashboard .action-btn:hover {
+            background: #8e2de2;
+        }
     </style>
 </head>
 <body>
@@ -131,6 +151,10 @@
         <button class="account-btn" id="accountButton1">Account 1</button>
         <button class="account-btn" id="accountButton2">Account 2</button>
         <button class="account-btn" id="accountButton3">Account 3</button>
+        <div class="action-btn-container">
+            <button class="action-btn" id="addAccountButton">Add Account</button>
+            <button class="action-btn" id="deleteAccountButton">Delete Account</button>
+        </div>
     </div>
 </body>
 <script src="https://s3.eu-west-1.amazonaws.com/cdn.growtopiagame.com/website/resources/vendors/jquery/jquery-2.1.4.min.js"></script>
@@ -210,6 +234,12 @@
         });
         document.getElementById('accountButton3').addEventListener('click', function () {
             alert('Account 3 button clicked!');
+        });
+        document.getElementById('addAccountButton').addEventListener('click', function () {
+            alert('Add Account button clicked!');
+        });
+        document.getElementById('deleteAccountButton').addEventListener('click', function () {
+            alert('Delete Account button clicked!');
         });
     });
 </script>
