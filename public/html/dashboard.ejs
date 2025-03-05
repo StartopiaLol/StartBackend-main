@@ -89,6 +89,7 @@
             width: 100px;
             height: 100px;
             cursor: pointer;
+            margin: 10px;
         }
     </style>
 </head>
@@ -116,7 +117,9 @@
     </div>
     <div class="dashboard" id="dashboard">
         <h2>Dashboard</h2>
-        <img src="assets.jpg" alt="Dashboard Button" id="dashboardButton" />
+        <img src="assets.jpg" alt="Dashboard Button 1" id="dashboardButton1" />
+        <img src="assets.jpg" alt="Dashboard Button 2" id="dashboardButton2" />
+        <img src="assets.jpg" alt="Dashboard Button 3" id="dashboardButton3" />
     </div>
 </body>
 <script src="https://s3.eu-west-1.amazonaws.com/cdn.growtopiagame.com/website/resources/vendors/jquery/jquery-2.1.4.min.js"></script>
@@ -188,8 +191,14 @@
             document.getElementById('dashboard').style.display = 'flex';
         });
 
-        document.getElementById('dashboardButton').addEventListener('click', function () {
-            alert('Dashboard button clicked!');
+        document.getElementById('dashboardButton1').addEventListener('click', function () {
+            alert('Dashboard button 1 clicked!');
+        });
+        document.getElementById('dashboardButton2').addEventListener('click', function () {
+            alert('Dashboard button 2 clicked!');
+        });
+        document.getElementById('dashboardButton3').addEventListener('click', function () {
+            alert('Dashboard button 3 clicked!');
         });
     });
 </script>
