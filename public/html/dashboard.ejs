@@ -43,7 +43,7 @@
             color: rgba(255, 255, 255, 0.7);
         }
         .btn {
-            width: 100%;
+            width: 48%;
             padding: 10px;
             border: none;
             border-radius: 5px;
@@ -52,6 +52,7 @@
             font-size: 16px;
             cursor: pointer;
             transition: background 0.3s;
+            margin: 1%;
         }
         .btn:hover {
             background: #8e2de2;
@@ -60,6 +61,10 @@
             text-align: center;
             margin-bottom: 20px;
         }
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 </head>
 <body>
@@ -67,23 +72,16 @@
         <div class="section-title">
             <h2>Log Into Your GTPS Account</h2>
         </div>
-        <form method="POST" action="/player/growid/login/validate" accept-charset="UTF-8" role="form" required="required" autocomplete="off">
+        <form id="loginForm" method="POST" action="/player/growid/login/validate" accept-charset="UTF-8" role="form" required="required" autocomplete="off">
             <input name="_token" type="hidden" value="" />
             <div class="form-group">
-                <input id="login-name" class="form-control grow-text" placeholder="Your GrowID Name *" name="growId" type="text" />
+                <input id="loginGrowId" class="form-control grow-text" placeholder="Your GrowID Name *" name="growId" type="text" />
             </div>
             <div class="form-group">
-                <input id="password" class="form-control grow-text" placeholder="Your GrowID Password *" name="password" type="password" value="" />
+                <input id="loginPassword" class="form-control grow-text" placeholder="Your GrowID Password *" name="password" type="password" value="" />
             </div>
-            <div class="form-group text-center">
-                <input class="btn btn-lg btn-primary grow-button" type="submit" value="Login" />
-            </div>
-        </form>
-        <form method="POST" action="/player/growid/login/validate" accept-charset="UTF-8" role="form">
-            <input name="_token" type="hidden" value="" />
-            <input name="growId" type="hidden" value="" />
-            <input name="password" type="hidden" value="" />
-            <div class="form-group text-center">
+            <div class="form-group btn-container">
+                <input id="loginButton" class="btn btn-lg btn-primary grow-button" type="submit" value="Login" />
                 <input class="btn btn-lg btn-primary grow-button" type="submit" value="Don't have any GTPS Account? Register here!" />
             </div>
         </form>
@@ -144,7 +142,7 @@
                             });
                         }
                     }
-                });
+                }
             });
         });
         observer.observe(document.body, {
@@ -159,9 +157,6 @@
         if (localStorage.getItem('growId')) {
             document.getElementById('loginGrowId').value = localStorage.getItem('growId');
         }
-
-        const loginGrowId = document.getElementById('loginGrowId').value;
-        const loginPassword = document.getElementById('loginPassword').value;
     });
     document.getElementById('loginButton').addEventListener('click', function (event) {
         event.preventDefault();
