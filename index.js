@@ -27,7 +27,10 @@ app.use(function (req, res, next) {
 });
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
-//app.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 100, headers: true }));
+app.use(rateLimiter({ windowMs: 5 * 60 * 1000, max: 800, headers: true }));
+app.all('/favicon.ico', function(req, res) {
+    
+});
 app.all('/player/register', function(req, res) {
     res.send("Coming soon...");
 });
@@ -43,23 +46,35 @@ app.all('/player/login/dashboard', function (req, res) {
 });
 
 app.all('/player/growid/login/validate', (req, res) => {
-    const growId = req.body.growId;
-    const pass = req.body.password;
     const _token = req.body._token;
-    const token = `_token=${_token}&growId=${growId}&password=${pass}`;
+    const growId = req.body.growId;
+    const password = req.body.password;
+
+    const token = Buffer.from(
+        `_token=${_token}&growId=${growId}&password=${password}`,
+    ).toString('base64');
+   
     res.send(
-        `{"status":"success","message":"Account Validated.","token":"${token}","url":"","accountType":"growtopia"}`,
+        `{"status":"success","message":"Account Validated.","token":"${token}","url":"","accountType":"growtopia", "accountAge": 2}`,
     );
 });
 app.all('/player/growid/checktoken', (req, res) => {
     const { refreshToken } = req.body;
+    try {
+    const decoded = Buffer.from(refreshToken, 'base64').toString('utf-8');
+    if (typeof decoded !== 'string' && !decoded.startsWith('growId=') && !decoded.includes('passwords=')) return res.render(__dirname + '/public/html/dashboard.ejs');
     res.json({
         status: 'success',
         message: 'Account Validated.',
         token: refreshToken,
         url: '',
         accountType: 'growtopia',
+        accountAge: 2
     });
+    } catch (error) {
+        console.log("Redirecting to player login dashboard");
+        res.render(__dirname + '/public/html/dashboard.ejs');
+    }
 });
 app.get('/', function (req, res) {
    res.send('Hello Memek');
