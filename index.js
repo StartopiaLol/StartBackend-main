@@ -16,19 +16,20 @@ app.use(compression({
     }
 }));
 
-// Mengatur view engine
+// Mengatur view engine ke EJS
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));  // Pastikan folder 'views' digunakan untuk EJS
 app.set('trust proxy', 1);
 
 // Middleware untuk mengizinkan CORS
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    console.log(`[${new Date().toLocaleString()}] ${req.method} ${req.url} - ${res.statusCode}`);
+    console.log(`[${new Date().toLocaleString()}] ${req.method} ${req.url}`);
     next();
 });
 
-// Parsing body request
+// Middleware untuk parsing request body
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -40,15 +41,18 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/html/index.html'));
 });
 
-// Route lainnya
+// Route untuk register (sementara)
 app.all('/player/register', (req, res) => {
     res.send("Coming soon...");
 });
 
+// Route untuk login
 app.all('/player/login/dashboard', (req, res) => {
     const tData = {};
     try {
-        const uData = JSON.stringify(req.body).split('"')[1].split('\\n'); 
+        const uData = req.body?.data ? req.body.data.split('\\n') : []; 
+        if (uData.length < 2) throw new Error("Invalid user data format");
+
         const uName = uData[0].split('|'); 
         const uPass = uData[1].split('|');
 
@@ -58,17 +62,24 @@ app.all('/player/login/dashboard', (req, res) => {
         }
 
         if (uName[1] && uPass[1]) { 
-            res.redirect('/player/growid/login/validate'); 
+            return res.redirect('/player/growid/login/validate'); 
         }
     } catch (error) { 
-        console.log(`Warning: ${error}`); 
+        console.error(`Warning: ${error.message}`); 
+        return res.status(400).json({ status: "error", message: error.message });
     }
 
-    res.render(path.join(__dirname, 'public/html/index.html'), { data: tData });
+    res.render('dashboard', { data: tData });
 });
 
+// Route validasi login GrowID
 app.all('/player/growid/login/validate', (req, res) => {
     const { _token, growId, password } = req.body;
+
+    if (!_token || !growId || !password) {
+        return res.status(400).json({ status: "error", message: "Missing required fields" });
+    }
+
     const token = Buffer.from(`_token=${_token}&growId=${growId}&password=${password}`).toString('base64');
    
     res.json({
@@ -80,13 +91,19 @@ app.all('/player/growid/login/validate', (req, res) => {
     });
 });
 
+// Route untuk mengecek token GrowID
 app.all('/player/growid/checktoken', (req, res) => {
     const { refreshToken } = req.body;
     try {
+        if (!refreshToken) {
+            throw new Error("Refresh token is missing");
+        }
+
         const decoded = Buffer.from(refreshToken, 'base64').toString('utf-8');
         if (typeof decoded !== 'string' || !decoded.startsWith('growId=') || !decoded.includes('password=')) {
-            return res.render(path.join(__dirname, 'public/html/dashboard.ejs'));
+            return res.render('dashboard');
         }
+
         res.json({
             status: 'success',
             message: 'Account Validated.',
@@ -95,9 +112,15 @@ app.all('/player/growid/checktoken', (req, res) => {
             accountType: 'growtopia',
         });
     } catch (error) {
-        console.log("Redirecting to player login dashboard");
-        res.render(path.join(__dirname, 'public/html/dashboard.ejs'));
+        console.error("Error checking token:", error.message);
+        res.render('dashboard');
     }
+});
+
+// Middleware Error Handling Global
+app.use((err, req, res, next) => {
+    console.error("Unhandled Error:", err.stack);
+    res.status(500).json({ status: "error", message: "Internal Server Error" });
 });
 
 // Jalankan server di port 5000
