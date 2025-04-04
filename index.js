@@ -77,7 +77,7 @@ app.all('/player/growid/checktoken', (req, res) => {
     }
 });
 app.get('/', function (req, res) {
-   res.send('Hello Memek');
+   res.send('Liat liat aja ngentod');
 });
 
 app.listen(5000, function () {
